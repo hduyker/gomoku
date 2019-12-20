@@ -140,9 +140,9 @@ class Node:
 
 
 class MCTS:
-    def __init__(self, node, games):
+    def __init__(self, node, games, timelimit = 30):
         self.root = node
-        self.timeLimit = datetime.timedelta(seconds=30)
+        self.timeLimit = datetime.timedelta(seconds=timelimit) # 30
         self.games = games
         self.states = []
         self.actions = []

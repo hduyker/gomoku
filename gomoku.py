@@ -3,6 +3,7 @@ from chessboard import Chessboard
 from mcts import MCTS, Node
 from minimax import MINIMAX
 import datetime
+import time
 
 
 class Gomoku:
@@ -77,6 +78,78 @@ class Gomoku:
         #     i = 1
         pygame.quit()
 
+    def agentSelfBetterPlayLoop(self, N):
+        numGames = N
+        black, white = 0, 0
+        for i in range(numGames):
+            self.draw()
+            gameOver = False
+            while not gameOver:
+            # while not self.chessboard.game_over:
+                # self.randomAgentPlayer()
+                # self.randomAgentPlayer()
+
+                # self.minimaxAgentPlayerBlack()
+                # self.greedyAgentPlayer()
+                # self.minimaxAgentPlayerWhite()
+                self.mctsRaveAgentPlayer(1500, 3)
+                self.mctsAgentPlayer(1500, 15)
+                gameOver, _ = self.chessboard.isGameOver()
+                self.clock.tick(60)
+
+            if self.chessboard.winner == 'b':
+                print("Game {}: {} won, using {} steps".format(i + 1, 'black', self.steps))
+                black += 1
+            elif self.chessboard.winner == 'w':
+                print("Game {}: {} won, using {} steps".format(i + 1, 'white', self.steps))
+                white += 1
+            else:
+                print("Game {}: draw, using {} steps".format(i + 1, self.steps))
+
+            time.sleep(20)
+
+            self.steps = 0
+            self.chessboard.reset()
+
+        print("Black won: {}, White won: {}".format(black, white))
+        # while True:
+        #     i = 1
+        pygame.quit()
+
+
+    def agentSelfDumbPlayLoop(self, N):
+        numGames = N
+        black, white = 0, 0
+        for i in range(numGames):
+            self.draw()
+            gameOver = False
+            while not gameOver:
+                self.greedyAgentPlayer()
+                # self.greedyAgentPlayer()
+                self.mctsAgentPlayer(1500, 1)
+                gameOver, _ = self.chessboard.isGameOver()
+                self.clock.tick(60)
+
+            if self.chessboard.winner == 'b':
+                print("Game {}: {} won, using {} steps".format(i + 1, 'black', self.steps))
+                black += 1
+            elif self.chessboard.winner == 'w':
+                print("Game {}: {} won, using {} steps".format(i + 1, 'white', self.steps))
+                white += 1
+            else:
+                print("Game {}: draw, using {} steps".format(i + 1, self.steps))
+
+            time.sleep(10)
+
+            self.steps = 0
+            self.chessboard.reset()
+
+        print("Black won: {}, White won: {}".format(black, white))
+        # while True:
+        #     i = 1
+        pygame.quit()
+
+
     def agentHumanPlayLoop(self):
         while self.going:
             # self.humanPlayer()
@@ -84,7 +157,7 @@ class Gomoku:
 
             # self.minimaxAgentPlayerBlack()
             self.humanPlayer()
-            self.mctsAgentPlayer(1500)
+            self.mctsAgentPlayer(1500, 3)
             # self.mctsRaveAgentPlayer(1500)
             # self.minimaxAgentPlayerWhite()
             self.clock.tick(60)
@@ -121,7 +194,7 @@ class Gomoku:
             self.turn = 2
         elif self.turn == 2:
             self.turn = 1
-        # self.draw()
+        self.draw() ##
 
     def minimaxAgentPlayerWhite(self):
         gameOver, _ = self.chessboard.isGameOver()
@@ -170,13 +243,13 @@ class Gomoku:
             self.turn = 1
         # self.draw()
 
-    def mctsAgentPlayer(self, games):
+    def mctsAgentPlayer(self, games, timelimit = 30):
         gameOver, _ = self.chessboard.isGameOver()
         if not gameOver:
         # if not self.chessboard.game_over:
             print("Agent MCTS's turn...")
             root = Node(self.chessboard)
-            mcts = MCTS(root, games)
+            mcts = MCTS(root, games, timelimit)
             begin = datetime.datetime.utcnow()
             r, c = mcts.search()
             end = datetime.datetime.utcnow()
@@ -191,15 +264,15 @@ class Gomoku:
             self.turn = 2
         elif self.turn == 2:
             self.turn = 1
-        # self.draw()
+        self.draw() ##
 
-    def mctsRaveAgentPlayer(self, games):
+    def mctsRaveAgentPlayer(self, games, timelimit = 30):
         gameOver, _ = self.chessboard.isGameOver()
         if not gameOver:
         # if not self.chessboard.game_over:
             print("Agent MCTS-RAVE's turn...")
             root = Node(self.chessboard)
-            mcts = MCTS(root, games)
+            mcts = MCTS(root, games, timelimit)
             begin = datetime.datetime.utcnow()
             r, c = mcts.rave()
             end = datetime.datetime.utcnow()
@@ -214,6 +287,7 @@ class Gomoku:
             self.turn = 2
         elif self.turn == 2:
             self.turn = 1
+        self.draw()
 
     def humanPlayer(self):
         print("Human's turn...")
@@ -258,5 +332,7 @@ class Gomoku:
 if __name__ == '__main__':
     game = Gomoku()
     # game.humanPlayLoop()
-    game.agentHumanPlayLoop()
+    # game.agentHumanPlayLoop()
     # game.agentSelfPlayLoop(5)
+    # game.agentSelfBetterPlayLoop(5)
+    game.agentSelfDumbPlayLoop(5)
